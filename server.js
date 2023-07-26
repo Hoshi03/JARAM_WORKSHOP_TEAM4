@@ -8,9 +8,11 @@ app.use(express.static('public'));
 
 // app.set('OPENAI_API_KEY', process.env.OPENAI_API_KEY) ;
 
-console.log(process.env.OPENAI_API_KEY);
+// console.log(process.env.OPENAI_API_KEY);
+
 const api_key = process.env.OPENAI_API_KEY;
-console.log(api_key);
+
+// console.log(api_key);
 
 let config = new Configuration({
   apiKey: `${api_key}`,
