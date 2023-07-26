@@ -12,7 +12,7 @@ app.use(express.static('public'));
 
 const api_key = process.env.OPENAI_API_KEY;
 
-// console.log(api_key);
+console.log(api_key);
 
 let config = new Configuration({
   apiKey: `${api_key}`,
@@ -23,6 +23,8 @@ let openai = new OpenAIApi(config);
 app.get('/', function(req,res){
   res.sendFile(__dirname + '/index.html')
 })
+
+let ingredients = [];
 
 var client_id = '5v7pE3U7G_m0Eiovkp5b';
 var client_secret = '2u3g2o6Ppw';
@@ -70,6 +72,11 @@ app.get('/translate', function (req, res) {
 
    });
  });
+
+ // '/ingredients' 엔드포인트를 통해 입력한 재료 배열 반환
+app.get('/ingredients', function (req, res) {
+  res.status(200).json(ingredients);
+});
 
 
  app.listen(3000, function () {
