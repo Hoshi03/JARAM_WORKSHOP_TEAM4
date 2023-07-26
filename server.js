@@ -5,7 +5,7 @@ var { OpenAIApi, Configuration } = require('openai');
 app.use(express.static('public'));
 
 let config = new Configuration({
-  apiKey: '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',
+  apiKey: 'api-key',
 });
 let openai = new OpenAIApi(config);
 
