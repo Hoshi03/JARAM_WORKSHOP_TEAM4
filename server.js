@@ -1,11 +1,18 @@
+// console.log('process.env.OPENAI_API_KEY');
+// console.log("DB_HOST:", '${process.env.OPENAI_API_KEY}');
+// console.log(app.get('OPENAI_API_KEY'));
+
 var express = require('express');
 var app = express();
+var dotenv = require('dotenv');
+dotenv.config();
 var request = require('request');
 var { OpenAIApi, Configuration } = require('openai');
 app.use(express.static('public'));
+app.set('OPENAI_API_KEY', process.env.OPENAI_API_KEY) ;
 
 let config = new Configuration({
-  apiKey: 'api-key',
+  apiKey: `${app.get('OPENAI_API_KEY')}`,
 });
 let openai = new OpenAIApi(config);
 
