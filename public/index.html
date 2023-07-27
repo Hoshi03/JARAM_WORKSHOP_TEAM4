@@ -12,11 +12,14 @@
 <body>
   <div class="container">
     <h1>레시피 추천 챗봇</h1>
+    <div class="input-container">
+      <button class="send-btn" id="addIngredient">추가</button>
+    </div>
     <div class="chat-content">
       <div class="reply-container" id="chatContent"></div>
     </div>
     <div class="input-container">
-      <input class="input-box" id="input">
+      <input class="input-box" id="input" placeholder="메시지를 입력하세요">
       <button class="send-btn" id="send">전송</button>
     </div>
 
@@ -27,7 +30,37 @@
 
   <script src="https://cdn.jsdelivr.net/npm/axios@1.1.3/dist/axios.min.js"></script>
   <script type="module">
-    // Function to fetch and display words
+
+    // 새로고침마다 갱신
+    displayWords();
+    updateIngredients();
+
+    // 추가버튼 눌릴때 이벤트
+    document.querySelector('#addIngredient').addEventListener('click', function () {
+      if (ingredients !== "") {
+        const additionalInfo = "이 재료로 가능한 요리 레시피를 알려줘, 레시피는 자세하고 말투는 친절하게 부탁해";
+        const message = ingredients.join(", ") + additionalInfo;
+        // 입력한 재료들을 메시지에 추가하여 챗봇으로 전송
+        let fullMessage = message + " (재료: " + ingredients.join(", ") + ")";
+        let q = 'http://localhost:3000/translate?q=' + fullMessage;
+        axios.get(q).then(r => {
+          var 결과 = JSON.parse(r.data).message.result.translatedText;
+
+          let template2 = `
+            <div class="chatbot-container">
+              ${결과}
+            </div>
+          `;
+          document.querySelector('#chatContent').insertAdjacentHTML('beforeend', template2);
+        }).catch((error) => { console.log('실패', error) });
+        // console.log(fullMessage);
+      }
+    });
+
+    // 입력한 재료를 저장할 배열 선언
+    let ingredients = [];
+
+    // 입력한 재료를 보여주는 함수
     function displayWords() {
       axios.get('http://localhost:3000/words')
         .then(response => {
@@ -54,11 +87,7 @@
           console.log('Failed to fetch words:', error);
         });
     }
-
-    // Call the displayWords function on page load
-    displayWords();
-    updateIngredients();
-
+    // 전송버튼 눌렸을때 재료 추가
     document.querySelector('#send').addEventListener('click', function () {
         let template1 = `
         <div class="reply-container">
@@ -94,7 +123,7 @@
     //       console.log('데이터베이스 조회 실패:', error);
     //     });
     // }
-    // Function to delete a word by ID
+///// Function to delete a word by ID
     function deleteWord(id) {
       axios.delete(`http://localhost:3000/words/${id}`)
         .then(() => {
@@ -106,8 +135,8 @@
           console.log('Failed to delete word:', error);
         });
     }
-    // 입력한 재료를 저장할 배열 선언
-    let ingredients = [];
+
+    
 //////// DB속 데이터를 ingredients에 저장함수
     function updateIngredients() {
     axios.get('http://localhost:3000/words')
@@ -120,39 +149,6 @@
         console.log('단어 목록 업데이트 실패:', error);
       });
   }
-//////////////
-    document.querySelector('#send').addEventListener('click', function () {
-      const inputMessage = document.querySelector('#input');
-      const userInput  = inputMessage.value.trim();
-      if (ingredients !== "") {
-        const additionalInfo = "이 재료로 가능한 요리 레시피를 알려줘, 레시피는 자세하고 말투는 친절하게 부탁해";
-        const message = userInput + additionalInfo;
-        
-        // // 유저 메세지
-        // let template1 = `
-        //   <div class="user-container">
-        //     ${message}
-        //   </div>
-        // `;
-        // document.querySelector('#chatContent').insertAdjacentHTML('beforeend', template1);
-
-        // 입력한 재료들을 메시지에 추가하여 챗봇으로 전송
-        let fullMessage = message + " (재료: " + ingredients.join(", ") + ")";
-        let q = 'http://localhost:3000/translate?q=' + fullMessage;
-        axios.get(q).then(r => {
-          var 결과 = JSON.parse(r.data).message.result.translatedText;
-
-          let template2 = `
-            <div class="chatbot-container">
-              ${결과}
-            </div>
-          `;
-          document.querySelector('#chatContent').insertAdjacentHTML('beforeend', template2);
-        }).catch((error) => { console.log('실패', error) });
-
-        inputMessage.value = ""; // 입력창 비우기
-      }
-    });
   </script>
 
 </body>
