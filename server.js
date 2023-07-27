@@ -26,8 +26,8 @@ app.get('/', function(req,res){
 
 let ingredients = [];
 
-var client_id = '5v7pE3U7G_m0Eiovkp5b';
-var client_secret = '2u3g2o6Ppw';
+var client_id = 'EnXfgrtCVZ7y4g3KCb3T';
+var client_secret = 'cVhf5Y3Ny0';
 
 app.get('/translate', function (req, res) {
    var api_url = 'https://openapi.naver.com/v1/papago/n2mt';
