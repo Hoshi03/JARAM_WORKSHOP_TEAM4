@@ -1,0 +1,41 @@
+<!-- ... (이전의 HTML 코드) -->
+
+<script type="module">
+  // ... (이전의 JavaScript 코드)
+
+  // 데이터베이스에서 단어 목록을 가져와 ingredients 배열을 업데이트하는 함수
+  function updateIngredients() {
+    axios.get('http://localhost:3000/words')
+      .then(response => {
+        const wordList = response.data;
+        ingredients = wordList.map(wordObj => wordObj.word);
+        console.log('업데이트된 ingredients 배열:', ingredients);
+      })
+      .catch(error => {
+        console.log('단어 목록 업데이트 실패:', error);
+      });
+  }
+
+  // 페이지 로드시 displayWords 함수 호출하여 단어 목록 표시
+  updateIngredients();
+
+  document.querySelector('#send').addEventListener('click', function () {
+    // ... (이전의 JavaScript 코드)
+
+    axios.get(q).then(r => {
+      var 결과 = JSON.parse(r.data).message.result.translatedText;
+      // ... (이전의 JavaScript 코드)
+
+      // 입력한 재료를 데이터베이스에 추가
+      addWordToDatabase(ingredients.join(", "));
+
+      // ingredients 배열 업데이트
+      updateIngredients();
+
+      inputMessage.value = ""; // 입력창 비우기
+    });
+  });
+
+  // ... (이전의 JavaScript 코드)
+
+</script>

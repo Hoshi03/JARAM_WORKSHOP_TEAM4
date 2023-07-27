@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 
 <head>
   <meta charset="UTF-8">
@@ -41,7 +41,7 @@
 
             // Create a delete button for each word
             const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Delete';
+            deleteButton.textContent = "삭제";
             deleteButton.addEventListener('click', () => {
               deleteWord(word.id); // Pass the word ID to the deleteWord function
             });
@@ -57,6 +57,7 @@
 
     // Call the displayWords function on page load
     displayWords();
+    updateIngredients();
 
     document.querySelector('#send').addEventListener('click', function () {
         let template1 = `
@@ -78,7 +79,9 @@
           document.querySelector('#chatContent').insertAdjacentHTML('beforeend', template2);
 
           // Call the function to fetch and display the updated database contents
-          fetchWordList();
+          // fetchWordList();
+          displayWords();
+          // updateIngredients();
         }).catch((error) => { console.log('실패', error) });
       });
     // function fetchWordList() {
@@ -97,11 +100,59 @@
         .then(() => {
           console.log('단어가 성공적으로 삭제되었습니다.');
           displayWords(); // Refresh the word list after deletion
+          updateIngredients();
         })
         .catch(error => {
           console.log('Failed to delete word:', error);
         });
     }
+    // 입력한 재료를 저장할 배열 선언
+    let ingredients = [];
+//////// DB속 데이터를 ingredients에 저장함수
+    function updateIngredients() {
+    axios.get('http://localhost:3000/words')
+      .then(response => {
+        const wordList = response.data;
+        ingredients = wordList.map(wordObj => wordObj.word);
+        console.log('업데이트된 ingredients 배열:', ingredients);
+      })
+      .catch(error => {
+        console.log('단어 목록 업데이트 실패:', error);
+      });
+  }
+//////////////
+    document.querySelector('#send').addEventListener('click', function () {
+      const inputMessage = document.querySelector('#input');
+      const userInput  = inputMessage.value.trim();
+      if (ingredients !== "") {
+        const additionalInfo = "이 재료로 가능한 요리 레시피를 알려줘, 레시피는 자세하고 말투는 친절하게 부탁해";
+        const message = userInput + additionalInfo;
+        
+        // // 유저 메세지
+        // let template1 = `
+        //   <div class="user-container">
+        //     ${message}
+        //   </div>
+        // `;
+        // document.querySelector('#chatContent').insertAdjacentHTML('beforeend', template1);
+
+        // 입력한 재료들을 메시지에 추가하여 챗봇으로 전송
+        let fullMessage = message + " (재료: " + ingredients.join(", ") + ")";
+        let q = 'http://localhost:3000/translate?q=' + fullMessage;
+        axios.get(q).then(r => {
+          var 결과 = JSON.parse(r.data).message.result.translatedText;
+
+          let template2 = `
+            <div class="chatbot-container">
+              ${결과}
+            </div>
+          `;
+          document.querySelector('#chatContent').insertAdjacentHTML('beforeend', template2);
+        }).catch((error) => { console.log('실패', error) });
+
+        inputMessage.value = ""; // 입력창 비우기
+      }
+    });
   </script>
 
 </body>
