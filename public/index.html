@@ -5,104 +5,47 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>레시피 추천 챗봇</title>
-  <link rel="stylesheet" href="style.css">
+  <title>레시피 추천 챗봇 시작</title>
+  <style>
+    body {
+      background-image: url("https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FJpoAz%2Fbtso6qnWurF%2FfEOEioJk0Kw3T02e1Nk410%2Fimg.png"); /* 배경 이미지 경로 설정 */
+      background-size: auto; /* 이미지를 창에 맞게 확대/축소하여 채우도록 설정 */
+      background-repeat: no-repeat; /* 배경 이미지 반복 방지 */
+      background-position: center; /* 배경 이미지를 화면 중앙에 배치 */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      text-align: center;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .start-btn {
+      background-color: transparent;
+      color: #fff;
+      border: none;
+      padding: 20px 50px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 150px;
+    }
+  </style>
 </head>
 
 <body>
-  <div class="container">
-    <h1>레시피 추천 챗봇</h1>
-    <div class="input-container">
-      <input class="input-box" id="inputIngredients" placeholder="재료를 입력하세요">
-      <button class="send-btn" id="addIngredient">추가</button>
-    </div>
-    <div class="ingredient-container">
-      <h2>입력한 재료</h2>
-      <ul id="ingredientList"></ul>
-    </div>
-    <div class="chat-content">
-      <div class="reply-container" id="chatContent"></div>
-    </div>
-    <div class="input-container">
-      <input class="input-box" id="input" placeholder="메시지를 입력하세요">
-      <button class="send-btn" id="send">전송</button>
-    </div>
-  </div>
+    <button class="start-btn" id="startButton"></button>
 
-  <script src="https://cdn.jsdelivr.net/npm/axios@1.1.3/dist/axios.min.js"></script>
-  <script type="module">
-    // 입력한 재료를 저장할 배열 선언
-    let ingredients = [];
-
-    // 입력한 재료를 보여주는 함수
-    function displayIngredients() {
-      const ingredientList = document.getElementById("ingredientList");
-      ingredientList.innerHTML = "";
-
-      ingredients.forEach((ingredient, index) => {
-        const li = document.createElement("li");
-        li.textContent = ingredient;
-
-        // 삭제 버튼 생성
-        const deleteButton = document.createElement("button");
-        deleteButton.textContent = "삭제";
-        deleteButton.classList.add("delete-button"); // .delete-button 클래스를 추가
-        deleteButton.addEventListener("click", () => deleteIngredient(index));
-
-        li.appendChild(deleteButton);
-        ingredientList.appendChild(li);
-      });
-    }
-
-    // 재료를 추가하는 이벤트 핸들러
-    document.querySelector('#addIngredient').addEventListener('click', function () {
-      const inputIngredients = document.querySelector('#inputIngredients');
-      const ingredient = inputIngredients.value.trim();
-      if (ingredient !== "") {
-        // 입력한 재료를 배열에 추가하고, 화면에 보여주기
-        ingredients.push(ingredient);
-        displayIngredients();
-        inputIngredients.value = ""; // 입력창 비우기
-      }
-    });
-
-    // 재료를 삭제하는 함수
-    function deleteIngredient(index) {
-      ingredients.splice(index, 1);
-      displayIngredients();
-    }
-
-    document.querySelector('#send').addEventListener('click', function () {
-      const inputMessage = document.querySelector('#input');
-      const userInput  = inputMessage.value.trim();
-      if (ingredients !== "") {
-        const additionalInfo = "이 재료로 가능한 요리 레시피를 알려줘, 레시피는 자세하고 말투는 친절하게 부탁해";
-        const message = userInput + additionalInfo;
-        
-        // // 유저 메세지
-        // let template1 = `
-        //   <div class="user-container">
-        //     ${message}
-        //   </div>
-        // `;
-        // document.querySelector('#chatContent').insertAdjacentHTML('beforeend', template1);
-
-        // 입력한 재료들을 메시지에 추가하여 챗봇으로 전송
-        let fullMessage = message + " (재료: " + ingredients.join(", ") + ")";
-        let q = 'http://localhost:3000/translate?q=' + fullMessage;
-        axios.get(q).then(r => {
-          var 결과 = JSON.parse(r.data).message.result.translatedText;
-
-          let template2 = `
-            <div class="chatbot-container">
-              ${결과}
-            </div>
-          `;
-          document.querySelector('#chatContent').insertAdjacentHTML('beforeend', template2);
-        }).catch((error) => { console.log('실패', error) });
-
-        inputMessage.value = ""; // 입력창 비우기
-      }
+  <script>
+    document.querySelector('#startButton').addEventListener('click', function () {
+      window.location.href = 'receipe.html'; // 레시피 추천 챗봇 페이지로 이동
     });
   </script>
 </body>

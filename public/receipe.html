@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>레시피 추천 챗봇</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+    <h1>레시피 추천 챗봇</h1>
+    <div class="input-container">
+      <input class="input-box" id="inputIngredients" placeholder="재료를 입력하세요">
+      <button class="send-btn" id="addIngredient">추가</button>
+    </div>
+    <div class="ingredient-container">
+      <h2>입력한 재료</h2>
+      <ul id="ingredientList"></ul>
+    </div>
+    <div class="chat-content">
+      <div class="reply-container" id="chatContent"></div>
+    </div>
+    <div class="input-container">
+      <input class="input-box" id="input" placeholder="메시지를 입력하세요">
+      <button class="send-btn" id="send">전송</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.1.3/dist/axios.min.js"></script>
+  <script type="module">
+    // 입력한 재료를 저장할 배열 선언
+    let ingredients = [];
+
+    // 입력한 재료를 보여주는 함수
+    function displayIngredients() {
+      const ingredientList = document.getElementById("ingredientList");
+      ingredientList.innerHTML = "";
+
+      ingredients.forEach((ingredient, index) => {
+        const li = document.createElement("li");
+        li.textContent = ingredient;
+
+        // 삭제 버튼 생성
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "삭제";
+        deleteButton.classList.add("delete-button"); // .delete-button 클래스를 추가
+        deleteButton.addEventListener("click", () => deleteIngredient(index));
+
+        li.appendChild(deleteButton);
+        ingredientList.appendChild(li);
+      });
+    }
+
+     // 재료를 추가하는 이벤트 핸들러
+     document.querySelector('#addIngredient').addEventListener('click', function () {
+      const inputIngredients = document.querySelector('#inputIngredients');
+      const ingredient = inputIngredients.value.trim();
+      if (ingredient !== "") {
+        // 입력한 재료를 배열에 추가하고, 화면에 보여주기
+        ingredients.push(ingredient);
+        displayIngredients();
+        inputIngredients.value = ""; // 입력창 비우기
+      }
+    });
+
+    // 재료를 삭제하는 함수
+    function deleteIngredient(index) {
+      ingredients.splice(index, 1);
+      displayIngredients();
+    }
+
+    // 메시지를 챗봇에 전송하는 함수
+    function sendMessageToChatbot() {
+      const inputMessage = document.querySelector('#input');
+      const userInput = inputMessage.value.trim();
+      const additionalInfo = "이 재료로 가능한 요리 레시피를 알려줘";
+
+      // 사용자가 입력한 메시지에 따라 메시지를 조합하여 전송
+      let message = "";
+      if (userInput !== "") {
+        message = userInput + " " + additionalInfo;
+      } else {
+        message = additionalInfo;
+      }
+
+      // 유저 메세지
+      let template1 = `
+        <div class="user-container">
+          ${message}
+        </div>
+      `;
+      document.querySelector('#chatContent').insertAdjacentHTML('beforeend', template1);
+
+      // 입력한 재료들을 메시지에 추가하여 챗봇으로 전송
+      if (ingredients.length > 0) {
+        let fullMessage = message + " (재료: " + ingredients.join(", ") + ")";
+        let q = 'http://localhost:3000/translate?q=' + fullMessage;
+        axios.get(q).then(r => {
+          var 결과 = JSON.parse(r.data).message.result.translatedText;
+
+          let template2 = `
+            <div class="chatbot-container">
+              ${결과}
+            </div>
+          `;
+          document.querySelector('#chatContent').insertAdjacentHTML('beforeend', template2);
+        }).catch((error) => { console.log('실패', error) });
+      }
+
+      inputMessage.value = ""; // 입력창 비우기
+    }
+
+    // 전송 버튼 클릭 이벤트 핸들러
+    document.querySelector('#send').addEventListener('click', function () {
+      sendMessageToChatbot();
+    });
+
+    // 입력창에서 엔터 키 입력 이벤트 핸들러
+    document.querySelector('#input').addEventListener('keyup', function (event) {
+      if (event.keyCode === 13) { // 엔터 키를 누르면 전송 버튼과 동일한 동작 수행
+        sendMessageToChatbot();
+      }
+    });
+
+  </script>
+</body>
+
+</html>
